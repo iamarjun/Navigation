@@ -4,10 +4,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.animation.core.FastOutLinearInEasing
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.slideIn
-import androidx.compose.animation.slideOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,35 +19,22 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import com.arjun.navigation.destinations.HomeScreenDestination
-import com.arjun.navigation.destinations.SettingsScreenDestination
-import com.arjun.navigation.destinations.SubScreen1Destination
-import com.arjun.navigation.destinations.SubScreen2Destination
-import com.arjun.navigation.destinations.SubScreen3Destination
 import com.arjun.navigation.ui.theme.NavigationTheme
 import com.ramcosta.composedestinations.DestinationsNavHost
-import com.ramcosta.composedestinations.animations.defaults.NestedNavGraphDefaultAnimations
-import com.ramcosta.composedestinations.animations.defaults.RootNavGraphDefaultAnimations
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.NavGraph
-import com.ramcosta.composedestinations.annotation.RootNavGraph
+import com.ramcosta.composedestinations.annotation.RootGraph
+import com.ramcosta.composedestinations.generated.NavGraphs
+import com.ramcosta.composedestinations.generated.destinations.HomeScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.SettingsScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.SubScreen1Destination
+import com.ramcosta.composedestinations.generated.destinations.SubScreen2Destination
+import com.ramcosta.composedestinations.generated.destinations.SubScreen3Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import com.ramcosta.composedestinations.rememberNavHostEngine
 
-// Define NavGraphs
-@RootNavGraph(start = true)
-@NavGraph
-annotation class RootGraph(
-    val start: Boolean = false
-)
-
-@RootGraph
-@NavGraph
-annotation class DetailsGraph(
-    val start: Boolean = false
-)
+@NavGraph<RootGraph>
+annotation class DetailsGraph
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,91 +43,9 @@ class MainActivity : ComponentActivity() {
         setContent {
             NavigationTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    val engine = rememberNavHostEngine(
-                        navHostContentAlignment = Alignment.TopCenter,
-                        rootDefaultAnimations = RootNavGraphDefaultAnimations(
-                            enterTransition = {
-                                slideIn(
-                                    animationSpec = tween(
-                                        durationMillis = 200,
-                                        easing = FastOutLinearInEasing
-                                    ),
-                                    initialOffset = { IntOffset((it.width), 0) }
-                                )
-                            },
-                            exitTransition = {
-                                slideOut(
-                                    animationSpec = tween(
-                                        durationMillis = 200,
-                                        easing = FastOutLinearInEasing
-                                    ),
-                                    targetOffset = { IntOffset(-(0.4 * it.width).toInt(), 0) }
-                                )
-                            },
-                            popEnterTransition = {
-                                slideIn(
-                                    animationSpec = tween(
-                                        durationMillis = 200,
-                                        easing = FastOutLinearInEasing
-                                    ),
-                                    initialOffset = { IntOffset(-(0.4 * it.width).toInt(), 0) }
-                                )
-                            },
-                            popExitTransition = {
-                                slideOut(
-                                    animationSpec = tween(
-                                        durationMillis = 200,
-                                        easing = FastOutLinearInEasing
-                                    ),
-                                    targetOffset = { IntOffset(it.width, 0) }
-                                )
-                            }
-                        ),
-                        defaultAnimationsForNestedNavGraph = mapOf(
-                            NavGraphs.root to NestedNavGraphDefaultAnimations(
-                                enterTransition = {
-                                    slideIn(
-                                        animationSpec = tween(
-                                            durationMillis = 200,
-                                            easing = FastOutLinearInEasing
-                                        ),
-                                        initialOffset = { IntOffset((it.width), 0) }
-                                    )
-                                },
-                                exitTransition = {
-                                    slideOut(
-                                        animationSpec = tween(
-                                            durationMillis = 200,
-                                            easing = FastOutLinearInEasing
-                                        ),
-                                        targetOffset = { IntOffset(-(0.4 * it.width).toInt(), 0) }
-                                    )
-                                },
-                                popEnterTransition = {
-                                    slideIn(
-                                        animationSpec = tween(
-                                            durationMillis = 200,
-                                            easing = FastOutLinearInEasing
-                                        ),
-                                        initialOffset = { IntOffset(-(0.4 * it.width).toInt(), 0) }
-                                    )
-                                },
-                                popExitTransition = {
-                                    slideOut(
-                                        animationSpec = tween(
-                                            durationMillis = 200,
-                                            easing = FastOutLinearInEasing
-                                        ),
-                                        targetOffset = { IntOffset(it.width, 0) }
-                                    )
-                                }
-                            ),
-                        )
-                    )
                     DestinationsNavHost(
                         navGraph = NavGraphs.root,
                         modifier = Modifier.padding(innerPadding),
-                        engine = engine
                     )
                 }
             }
@@ -152,8 +53,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@RootGraph(start = true)
-@Destination
+@Destination<RootGraph>(start = true)
 @Composable
 fun HomeScreen(navigator: DestinationsNavigator) {
     Column(
@@ -170,7 +70,7 @@ fun HomeScreen(navigator: DestinationsNavigator) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Button(onClick = { navigator.navigate(NavGraphs.detailsGraph) }) {
+        Button(onClick = { navigator.navigate(NavGraphs.details) }) {
             Text(text = "Go to Details Graph")
         }
 
@@ -182,8 +82,7 @@ fun HomeScreen(navigator: DestinationsNavigator) {
     }
 }
 
-@DetailsGraph(start = true)
-@Destination
+@Destination<DetailsGraph>(start = true)
 @Composable
 fun DetailsScreen(navigator: DestinationsNavigator) {
     Column(
@@ -201,11 +100,7 @@ fun DetailsScreen(navigator: DestinationsNavigator) {
 
         Button(
             onClick = {
-                navigator.navigate(HomeScreenDestination) {
-                    popUpTo(HomeScreenDestination) {
-                        inclusive = true
-                    }
-                }
+                navigator.popBackStack(route = HomeScreenDestination, inclusive = false)
             }
         ) {
             Text(text = "Back to Home")
@@ -219,8 +114,7 @@ fun DetailsScreen(navigator: DestinationsNavigator) {
     }
 }
 
-@DetailsGraph
-@Destination
+@Destination<DetailsGraph>
 @Composable
 fun SubScreen1(navigator: DestinationsNavigator) {
     Column(
@@ -246,8 +140,7 @@ fun SubScreen1(navigator: DestinationsNavigator) {
     }
 }
 
-@DetailsGraph
-@Destination
+@Destination<DetailsGraph>
 @Composable
 fun SubScreen2(navigator: DestinationsNavigator) {
     Column(
@@ -278,8 +171,7 @@ fun SubScreen2(navigator: DestinationsNavigator) {
     }
 }
 
-@DetailsGraph
-@Destination
+@Destination<DetailsGraph>
 @Composable
 fun SubScreen3(navigator: DestinationsNavigator) {
     Column(
@@ -301,8 +193,7 @@ fun SubScreen3(navigator: DestinationsNavigator) {
     }
 }
 
-@RootGraph
-@Destination
+@Destination<RootGraph>
 @Composable
 fun SettingsScreen(navigator: DestinationsNavigator) {
     Column(
